@@ -1,0 +1,38 @@
+# Spark and Hadoop specific
+spark-warehouse/
+derby.log
+metastore_db/
+warehouse/
+*.crc
+_SUCCESS
+_temporary/
+
+# Scala specific
+*.class
+*.log
+target/
+dist/
+.scala_dependencies
+.worksheet
+
+# SBT specific
+.cache
+.history
+.lib/
+dist/*
+target/
+project/project/
+project/target/
+project/boot/
+project/plugins/project/
+
+# IntelliJ specific
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# Mac OS (in case you're using a Mac)
+.DS_Store
