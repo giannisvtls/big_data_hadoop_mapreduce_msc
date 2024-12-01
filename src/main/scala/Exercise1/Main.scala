@@ -1,4 +1,4 @@
-package `Exercise 4`
+package Exercise1
 
 import org.apache.spark.sql.SparkSession
 

@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/big_data_hadoop_mapreduce_msc.eap-spark.iml" filepath="$PROJECT_DIR$/.idea/modules/big_data_hadoop_mapreduce_msc.eap-spark.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/eap-spark.iml" filepath="$PROJECT_DIR$/.idea/modules/eap-spark.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/eap-spark-build.iml" filepath="$PROJECT_DIR$/.idea/modules/eap-spark-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/project.eap-spark-build.iml" filepath="$PROJECT_DIR$/.idea/modules/project.eap-spark-build.iml" />
     </modules>
   </component>
 </project>
