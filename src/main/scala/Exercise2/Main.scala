@@ -8,7 +8,7 @@ object Main {
                     imdbID: String,
                     title: String,
                     year: Int,
-                    runtime: Int,          // Will store just the number of minutes
+                    runtime: Int,
                     genre: List[String],
                     released: String,
                     imdbRating: Double,
@@ -31,7 +31,7 @@ object Main {
       if (runtimeStr == null || runtimeStr.trim.isEmpty) {
         0 // default value for missing runtime
       } else {
-        runtimeStr.replace(",", "").split(" ")(0).trim.toInt // extract just the number
+        runtimeStr.replace(",", "").split(" ")(0).trim.toInt
       }
     })
 
@@ -43,14 +43,14 @@ object Main {
         $"imdbID",
         $"title",
         $"year".cast("int"),
-        parseRuntime($"runtime").as("runtime"),  // Parse runtime string to Int
-        split($"genre", ",").as("genre"),        // Split on comma for genres
+        parseRuntime($"runtime").as("runtime"),
+        split($"genre", ",").as("genre"),
         $"released",
         $"imdbRating".cast("double"),
         $"imdbVotes".cast("double"),
-        split($"country", ",").as("countries")   // Split on comma for countries
+        split($"country", ",").as("countries")
       )
-      .distinct()  // Remove duplicates based on all columns
+      .distinct()
       .as[Movie]
 
     // Task 1: Total duration per country
