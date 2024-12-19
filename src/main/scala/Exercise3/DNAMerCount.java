@@ -21,7 +21,7 @@ public class DNAMerCount {
             String line = value.toString();
             int lineLength = line.length();
 
-            //2 counts
+            // 2 counts
 
             for (int i = 0; i <= lineLength - 2; i++) {
                 mer.set(line.substring(i, i + 2));

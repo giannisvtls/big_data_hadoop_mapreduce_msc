@@ -38,7 +38,7 @@ public class NumeronymCount {
         private int minCount;
 
         @Override
-        protected void setup(Context context) throws IOException, InterruptedException {
+        protected void setup(Context context) {
             Configuration conf = context.getConfiguration();
             minCount = conf.getInt("numeronym.min.count", 1); // Default to 1 if not set
         }
