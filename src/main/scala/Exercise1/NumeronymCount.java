@@ -62,23 +62,13 @@ public class NumeronymCount {
         }
 
         Configuration conf = new Configuration();
-        //
-
-
-
-        //
         conf.setInt("numeronym.min.count", Integer.parseInt(args[2]));
-
-
-        //
 
         Path outputPath = new Path(args[1]);
         FileSystem fs = FileSystem.get(conf);
         if (fs.exists(outputPath)) {
             fs.delete(outputPath, true); //delete the output folder if it already exists
         }
-
-        //
 
         Job job = Job.getInstance(conf, "numeronym count");
         job.setJarByClass(NumeronymCount.class);
