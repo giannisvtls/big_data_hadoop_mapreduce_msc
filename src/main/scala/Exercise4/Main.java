@@ -1,27 +1,9 @@
 package Exercise4;
 
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.expressions.UserDefinedFunction;
 import static org.apache.spark.sql.functions.*;
 
 public class Main {
-  // Edge class to represent graph edges
-  public static class Edge {
-    private int source;
-    private int target;
-    private double probability;
-
-    public Edge(int source, int target, double probability) {
-      this.source = source;
-      this.target = target;
-      this.probability = probability;
-    }
-
-    // Getters required for DataFrame conversion
-    public int getSource() { return source; }
-    public int getTarget() { return target; }
-    public double getProbability() { return probability; }
-  }
 
   public static void main(String[] args) {
     // Validate command line arguments
@@ -30,7 +12,7 @@ public class Main {
       System.exit(1);
     }
 
-    String inputFile = "src/main/scala/Exercise4/" + args[0];    // collins.txt
+    String inputFile = "src/main/scala/Exercise4/" + args[0];    // For example: collins.txt
     double threshold = Double.parseDouble(args[1]);  // probability threshold T
 
     // Create Spark session
