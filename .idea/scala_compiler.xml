@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ScalaCompilerConfiguration">
-    <profile name="sbt 1" modules="big_data_hadoop_mapreduce_msc.eap-spark,eap-spark" />
+    <profile name="sbt 1" modules="IdeaProjects.big_data_hadoop_mapreduce_msc.eap-spark,big_data_hadoop_mapreduce_msc.eap-spark,eap-spark" />
   </component>
 </project>
