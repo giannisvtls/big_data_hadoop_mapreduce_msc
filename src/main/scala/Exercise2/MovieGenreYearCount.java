@@ -13,6 +13,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class MovieGenreYearCount {
 
@@ -25,13 +26,20 @@ public class MovieGenreYearCount {
       // Skip the header of the csv file
       if (value.toString().startsWith("imdbID")) return;
 
-      String[] fields = value.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+      // Split rows and make an array
+      String[] unfilteredFields = value.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+
+      // Some columns are missing resulting an empty string for that column, we can filter those out
+      String[] fields = Arrays.stream(unfilteredFields)
+              .filter(field -> !field.equals(""))
+              .toArray(String[]::new);
 
       // Ignore fields with fewer columns
       if (fields.length < 9) return;
 
+      // Log errors and continue the job
       try {
-        // Get IMDb rating (field index 6)
+        // Get IMDb rating
         double score = Double.parseDouble(fields[6].trim());
 
         // Only process if score > 8
@@ -39,14 +47,14 @@ public class MovieGenreYearCount {
           String year = fields[2].trim();
           String[] genres = fields[4].replace("\"", "").split(",");
 
-          // Emit count for each genre
+          // Get count for each genre
           for (String genre : genres) {
             yearGenre.set(year + "_" + genre.trim());
             context.write(yearGenre, one);
           }
         }
-      } catch (NumberFormatException e) {
-        // Skip invalid entries
+      } catch (Exception e) {
+        System.err.println("Error processing movie: " + value + " With error: " + e.getMessage());
       }
     }
   }
@@ -55,8 +63,7 @@ public class MovieGenreYearCount {
     private final IntWritable result = new IntWritable();
 
     @Override
-    protected void reduce(Text key, Iterable<IntWritable> values, Context context)
-            throws IOException, InterruptedException {
+    protected void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
       int sum = 0;
       for (IntWritable val : values) {
         sum += val.get();

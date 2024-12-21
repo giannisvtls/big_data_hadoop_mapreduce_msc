@@ -52,16 +52,14 @@ public class Main {
 
       totalSum += sum;
       count++;
-
-      // Write the vertex and its degree
       context.write(key, new DoubleWritable(sum));
     }
 
     @Override
-    protected void cleanup(Context context) throws IOException, InterruptedException {
-      // Store the mean in a counter for the second job
-      double mean = totalSum / count;
-      context.getConfiguration().set("mean_degree", String.valueOf(mean));
+    protected void cleanup(Context context) {
+      // Use counters instead of configuration
+      context.getCounter("Mean", "Sum").setValue((long) (totalSum * 1000));
+      context.getCounter("Mean", "Count").setValue(count);
     }
   }
 
@@ -87,14 +85,26 @@ public class Main {
   }
 
   public static void main(String[] args) throws Exception {
-    if (args.length != 1) {
-      System.err.println("No threshold argument provided");
-      System.exit(-1);
+    if (args.length < 1) {
+      System.out.println("No threshold argument provided, defaulting to 0.5");
+    }
+
+    double threshold;
+    try {
+      threshold = (args.length > 0) ? Double.parseDouble(args[0]) : 0.5;
+    } catch (NumberFormatException e) {
+      System.err.println("Argument provided is not valid. Using default value of 0.5");
+      threshold = 0.5;
+    }
+
+    // Threshold Validation
+    if (threshold < 0 | threshold > 1) {
+      System.err.println("Threshold not in the desired range of 0-1. Using default value of 0.5");
+      threshold = 0.5;
     }
 
     String inputPath = "src/main/scala/Exercise4/collins.txt";
     String outputPath = "src/main/scala/Exercise4/output";
-    double threshold = Double.parseDouble(args[0]);
 
     String firstJobOutputPath = outputPath + "/task1";
 
@@ -119,11 +129,15 @@ public class Main {
       System.exit(1);
     }
 
+    // Calculate mean from counters
+    // Dividing with 1000 to get back a decimal
+    double totalSum = job1.getCounters().findCounter("Mean", "Sum").getValue() / 1000.0;
+    long count = job1.getCounters().findCounter("Mean", "Count").getValue();
+    double meanDegree = totalSum / count;
+
     String secondJobOutputPath = outputPath + "/task2";
-    // Job 2: Find vertices above mean
     Configuration conf2 = new Configuration();
-    // Get mean from job1's configuration
-    conf2.set("mean_degree", job1.getConfiguration().get("mean_degree"));
+    conf2.set("mean_degree", String.valueOf(meanDegree));
 
     Job job2 = Job.getInstance(conf2, "Above Mean Vertices");
     job2.setJarByClass(Main.class);

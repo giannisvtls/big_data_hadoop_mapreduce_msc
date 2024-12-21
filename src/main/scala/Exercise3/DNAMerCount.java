@@ -56,17 +56,15 @@ public class DNAMerCount {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length < 2) {
-            System.err.println("Usage: DNAMerCount <input path> <output path>");
-            System.exit(-1);
-        }
-
         Configuration conf = new Configuration();
 
-        Path outputPath = new Path(args[1]);
+        Path inputPath = new Path("src/main/scala/Exercise3/ecoli.txt");
+        Path outputPath = new Path("src/main/scala/Exercise3/dna_output");
+
+        // Delete the output folder if it already exists
         FileSystem fs = FileSystem.get(conf);
         if (fs.exists(outputPath)) {
-            fs.delete(outputPath, true); //delete the output folder if it already exists
+            fs.delete(outputPath, true);
         }
 
         Job job = Job.getInstance(conf, "DNA Mer Count");
@@ -77,10 +75,8 @@ public class DNAMerCount {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
 
-        //FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileInputFormat.addInputPath(job, new Path("DNA_input"));
-        //FileOutputFormat.setOutputPath(job, new Path(args[1]));
-        FileOutputFormat.setOutputPath(job, new Path("DNA_output"));
+        FileInputFormat.addInputPath(job, inputPath);
+        FileOutputFormat.setOutputPath(job, outputPath);
 
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }

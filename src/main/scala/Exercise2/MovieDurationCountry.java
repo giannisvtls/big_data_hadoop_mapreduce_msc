@@ -13,6 +13,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class MovieDurationCountry {
 
@@ -21,34 +22,41 @@ public class MovieDurationCountry {
         private final LongWritable duration = new LongWritable();
 
         @Override
-        protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+        protected void map(LongWritable key, Text value, Context context) {
             // Skip the header of the csv file
             if (value.toString().startsWith("imdbID")) return;
 
-            String[] fields = value.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+            // Split rows and make an array
+            String[] unfilteredFields = value.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+
+            // Some columns are missing resulting an empty string for that column, we can filter those out
+            String[] fields = Arrays.stream(unfilteredFields)
+                    .filter(field -> !field.equals(""))
+                    .toArray(String[]::new);
 
             // Ignore fields with fewer columns
             if (fields.length < 9) return;
 
+            // Log errors and continue the job
             try {
-                // Get runtime (field index 3)
+                // Get runtime
                 String runtimeStr = fields[3].trim();
 
-                // Extract numeric value from runtime
+                // Runtime has the format "10 mins", we need to extract the numeric value
                 runtimeStr = runtimeStr.replaceAll("[^0-9]", "");
                 long movieDuration = Long.parseLong(runtimeStr);
 
-                // Get countries (field index 8)
-                String[] countries = fields[8].replace("\"", "").split(",");
+                // Get countries, split entries with multiple countries
+                String[] countries = fields[8].split(",");
 
-                // Emit duration for each country
+                // Get duration for each country
                 for (String c : countries) {
                     country.set(c.trim());
                     duration.set(movieDuration);
                     context.write(country, duration);
                 }
-            } catch (NumberFormatException e) {
-                // Skip invalid duration entries
+            } catch (Exception e) {
+                System.err.println("Error processing movie: " + value + " With error: " + e.getMessage());
             }
         }
     }
@@ -56,8 +64,7 @@ public class MovieDurationCountry {
     public static class DurationSumReducer extends Reducer<Text, LongWritable, Text, LongWritable> {
         private final LongWritable result = new LongWritable();
 
-        protected void reduce(Text key, Iterable<LongWritable> values, Context context)
-                throws IOException, InterruptedException {
+        protected void reduce(Text key, Iterable<LongWritable> values, Context context) throws IOException, InterruptedException {
             long sum = 0;
             for (LongWritable val : values) {
                 sum += val.get();
