@@ -46,14 +46,19 @@ public class MovieDurationCountry {
                 runtimeStr = runtimeStr.replaceAll("[^0-9]", "");
                 long movieDuration = Long.parseLong(runtimeStr);
 
-                // Get countries, split entries with multiple countries
-                String[] countries = fields[8].split(",");
+                // Get countries, split entries with multiple countries and clean each country name
+                String countriesStr = fields[8].replaceAll("^\"|\"$", ""); // Remove surrounding quotes
+                String[] countries = countriesStr.split(",");
 
                 // Get duration for each country
                 for (String c : countries) {
-                    country.set(c.trim());
-                    duration.set(movieDuration);
-                    context.write(country, duration);
+                    // Remove any quotation marks and trim whitespace
+                    String cleanedCountry = c.replaceAll("\"", "").trim();
+                    if (!cleanedCountry.isEmpty()) {
+                        country.set(cleanedCountry);
+                        duration.set(movieDuration);
+                        context.write(country, duration);
+                    }
                 }
             } catch (Exception e) {
                 System.err.println("Error processing movie: " + value + " With error: " + e.getMessage());
